@@ -1,0 +1,42 @@
+[
+    {
+        "username": "jdoe",
+        "timestamp": "2024-07-24T08:00:00Z",
+        "ip_address": "203.0.113.5",
+        "location": "United States",
+        "status": "FAILED",
+        "details": "Incorrect password"
+    },
+    {
+        "username": "jdoe",
+        "timestamp": "2024-07-24T08:02:00Z",
+        "ip_address": "203.0.113.5",
+        "location": "United States",
+        "status": "FAILED",
+        "details": "Incorrect password"
+    },
+    {
+        "username": "jdoe",
+        "timestamp": "2024-07-24T08:05:00Z",
+        "ip_address": "198.51.100.42",
+        "location": "Unknown Country",
+        "status": "SUCCESS",
+        "details": "MFA Challenge Bypassed via Session Hijack"
+    },
+    {
+        "username": "admin_ops",
+        "timestamp": "2024-07-24T03:15:00Z",
+        "ip_address": "198.51.100.12",
+        "location": "Unknown Location",
+        "status": "SUCCESS",
+        "details": "Successful logon outside working hours"
+    },
+    {
+        "username": "developer1",
+        "timestamp": "2024-07-24T10:00:00Z",
+        "ip_address": "10.0.5.21",
+        "location": "Corporate HQ VPN",
+        "status": "SUCCESS",
+        "details": "Standard login"
+    }
+]

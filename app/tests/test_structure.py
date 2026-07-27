@@ -30,6 +30,10 @@ class TestSecureOpsStructure(unittest.TestCase):
         self.assertGreater(len(history), 0)
         self.assertEqual(history[2]["status"], "SUCCESS")
 
+        # Test dynamic entry checking logic added for JSON databases
+        res_not_found = execute_agent_workflow("check logins for unknownUser")
+        self.assertIn("does not exist", res_not_found["agent_response"])
+
     def test_endpoint_tools(self):
         status = check_device_status("WS-900")
         self.assertTrue(status["is_infected"])

@@ -4,101 +4,26 @@ Purpose: Tool & Integration Engineer (Team Member 2)
 Role:
 - Interfaces with the Mock SIEM or Firewall API to search and retrieve security alerts.
 - Provides functions to look up alert details and check threat severities.
+- Reads and updates alerts dynamically from 'app/data/alerts.json'.
 """
 
-# In-memory mock database of SIEM and Firewall alerts
-ALERTS_DATABASE = [
-    {
-        "alert_id": "ALT-101",
-        "system": "Firewall",
-        "description": "High volume of outbound traffic detected to external IP 198.51.100.42",
-        "severity": "HIGH",
-        "status": "OPEN",
-        "source_device": "WS-900",
-        "dest_ip": "198.51.100.42",
-        "timestamp": "2024-07-24T08:30:00Z"
-    },
-    {
-        "alert_id": "ALT-102",
-        "system": "Endpoint Protection",
-        "description": "Suspicious Trojan.Win32.Generic binary executed",
-        "severity": "HIGH",
-        "status": "OPEN",
-        "source_device": "WS-900",
-        "dest_ip": "None",
-        "timestamp": "2024-07-24T08:35:00Z"
-    },
-    {
-        "alert_id": "ALT-103",
-        "system": "Identity Management",
-        "description": "Multiple failed logins followed by successful login from Unknown Country (198.51.100.42)",
-        "severity": "MEDIUM",
-        "status": "OPEN",
-        "source_device": "Remote-IP-198.51.100.42",
-        "dest_ip": "None",
-        "timestamp": "2024-07-24T08:05:00Z"
-    },
-    {
-        "alert_id": "ALT-104",
-        "system": "Firewall",
-        "description": "Outbound connection to known Tor exit node",
-        "severity": "CRITICAL",
-        "status": "OPEN",
-        "source_device": "WS-550",
-        "dest_ip": "192.0.2.11",
-        "timestamp": "2024-07-24T12:00:00Z"
-    },
-    {
-        "alert_id": "ALT-105",
-        "system": "Identity Management",
-        "description": "Privileged account activity outside normal working hours",
-        "severity": "MEDIUM",
-        "status": "OPEN",
-        "source_device": "Admin-Portal",
-        "dest_ip": "None",
-        "timestamp": "2024-07-24T03:15:00Z"
-    },
-    {
-        "alert_id": "ALT-106",
-        "system": "Cloud Infrastructure",
-        "description": "S3 Bucket permission updated to public access",
-        "severity": "HIGH",
-        "status": "OPEN",
-        "source_device": "CloudConsole-Admin",
-        "dest_ip": "None",
-        "timestamp": "2024-07-24T14:20:00Z"
-    },
-    {
-        "alert_id": "ALT-107",
-        "system": "Cloud Infrastructure",
-        "description": "Abnormal API volume usage on AWS CloudTrail",
-        "severity": "MEDIUM",
-        "status": "OPEN",
-        "source_device": "CloudConsole-Admin",
-        "dest_ip": "None",
-        "timestamp": "2024-07-24T14:21:00Z"
-    },
-    {
-        "alert_id": "ALT-108",
-        "system": "Endpoint Protection",
-        "description": "Suspicious PowerShell script attempting to stop shadow copies (VSS)",
-        "severity": "LOW",
-        "status": "OPEN",
-        "source_device": "WS-202",
-        "dest_ip": "None",
-        "timestamp": "2024-07-24T09:00:00Z"
-    },
-    {
-        "alert_id": "ALT-109",
-        "system": "Endpoint Protection",
-        "description": "Localized file encryption pattern matching Ransomware behavior",
-        "severity": "LOW",
-        "status": "OPEN",
-        "source_device": "WS-202",
-        "dest_ip": "None",
-        "timestamp": "2024-07-24T09:05:00Z"
-    }
-]
+import os
+import json
+
+ALERTS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "alerts.json")
+
+def _load_alerts():
+    if not os.path.exists(ALERTS_FILE):
+        return []
+    with open(ALERTS_FILE, "r") as f:
+        try:
+            return json.load(f)
+        except Exception:
+            return []
+
+def _save_alerts(alerts):
+    with open(ALERTS_FILE, "w") as f:
+        json.dump(alerts, f, indent=4)
 
 def search_alerts(query=None, severity=None):
     """
@@ -111,7 +36,7 @@ def search_alerts(query=None, severity=None):
     Returns:
         list: A list of mock alert dictionaries containing ID, system, description, and timestamp.
     """
-    results = ALERTS_DATABASE
+    results = _load_alerts()
     if severity:
         results = [a for a in results if a["severity"].upper() == severity.upper()]
     if query:
@@ -129,7 +54,8 @@ def get_alert_details(alert_id):
     Returns:
         dict: Detailed alert metadata or None if not found.
     """
-    for alert in ALERTS_DATABASE:
+    alerts = _load_alerts()
+    for alert in alerts:
         if alert["alert_id"].upper() == alert_id.upper():
             return alert
     return None
@@ -138,8 +64,10 @@ def update_alert_severity(alert_id, new_severity):
     """
     Simulates updating alert severity level. Requires Human-in-the-Loop validation if marking as CRITICAL.
     """
-    for alert in ALERTS_DATABASE:
+    alerts = _load_alerts()
+    for alert in alerts:
         if alert["alert_id"].upper() == alert_id.upper():
             alert["severity"] = new_severity.upper()
+            _save_alerts(alerts)
             return {"alert_id": alert_id, "status": "UPDATED", "severity": alert["severity"]}
     return None
