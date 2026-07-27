@@ -93,21 +93,51 @@ def identity_agent(state):
     """
     Handles Logins, Failed Attempts, User Activities, and Authentication logs.
     """
-    msg = state.get("user_message", "").lower()
+    msg = state.get("user_message", "")
 
-    username = "jdoe"
-    if "admin_ops" in msg:
-        username = "admin_ops"
-    elif "developer1" in msg:
-        username = "developer1"
+    # Try dynamically extracting username from phrases like "for <username>", "user <username>", or "check logins for <username>"
+    import re
+    username = None
 
+    # Check common patterns
+    match = re.search(r"for\s+([a-zA-Z0-9_\-\.]+)", msg, re.IGNORECASE)
+    if match:
+        username = match.group(1).strip()
+    else:
+        match = re.search(r"user\s+([a-zA-Z0-9_\-\.]+)", msg, re.IGNORECASE)
+        if match:
+            username = match.group(1).strip()
+
+    if not username:
+        # Fallback to checking specific keywords in the message body
+        msg_lower = msg.lower()
+        if "admin_ops" in msg_lower:
+            username = "admin_ops"
+        elif "developer1" in msg_lower:
+            username = "developer1"
+        elif "jdoe" in msg_lower:
+            username = "jdoe"
+        else:
+            username = "jdoe" # Global fallback
+
+    # Lookup in our mock tools
     history = check_login_history(username)
     activities = search_user_activity(username)
 
+    if not history and not activities:
+        state["agent_response"] = (
+            f"### Identity and IAM Profiling: {username}\n"
+            f"⚠️ No active authentication logs or system activities found for user **{username}** in the mock database."
+        )
+        return state
+
     response_text = f"### Identity and IAM Profiling: {username}\n"
     response_text += "#### Recent Authentication Records:\n"
-    for h in history[:3]:
-        response_text += f"- {h['timestamp']}: Status: **{h['status']}** from {h['ip_address']} ({h['location']}) - *{h['details']}*\n"
+    if history:
+        for h in history[:3]:
+            response_text += f"- {h['timestamp']}: Status: **{h['status']}** from {h['ip_address']} ({h['location']}) - *{h['details']}*\n"
+    else:
+        response_text += "- No recent login records found.\n"
 
     response_text += "\n#### Recent Access & User Actions:\n"
     if activities:
