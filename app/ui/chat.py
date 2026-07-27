@@ -72,8 +72,7 @@ def render_chat_interface():
 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("✅ Approve & Execute Action"):
-                # Execute gated tool
+            if st.button("✅ Approve & Execute Action", key="hitl_approve"):
                 res = handle_human_approval(app_act, app_det, analyst_approved=True)
                 st.session_state.messages.append({
                     "role": "assistant",
@@ -82,7 +81,7 @@ def render_chat_interface():
                 st.session_state.pending_approval = None
                 st.rerun()
         with col2:
-            if st.button("❌ Deny Action"):
+            if st.button("❌ Deny Action", key="hitl_deny"):
                 res = handle_human_approval(app_act, app_det, analyst_approved=False)
                 st.session_state.messages.append({
                     "role": "assistant",
@@ -92,15 +91,15 @@ def render_chat_interface():
                 st.rerun()
 
     # Chat User input interface
-    if prompt := st.chat_input("Ask SecureOps AI... (e.g. 'show alerts', 'correlate events')"):
+    if prompt := st.chat_input("Ask SecureOps AI... (e.g. 'show alerts', 'correlate events')", key="user_chat_input"):
         # Append and render user query
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
         # Execute multi-agent workflow graph run
-        with st.spinner("Supervisor Agent evaluating query & routing to Specialist..."):
-            state = execute_agent_workflow(prompt, st.session_state.messages)
+        # Note: Do not rely on st.spinner or multi-trigger blocks during immediate re-runs to avoid duplicates
+        state = execute_agent_workflow(prompt, st.session_state.messages[:-1])
 
         # If approval required, stash in session
         if state["approval_needed"]:
