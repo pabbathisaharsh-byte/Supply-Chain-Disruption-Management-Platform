@@ -11,6 +11,7 @@ from app.tools.identity_tools import check_login_history, search_user_activity
 from app.tools.endpoint_tools import check_device_status, verify_device_health
 from app.tools.correlation_tools import correlate_events
 from app.agents.supervisor import route_request
+from app.workflow.graph import build_workflow_graph
 
 class TestSecureOpsStructure(unittest.TestCase):
 
@@ -46,6 +47,14 @@ class TestSecureOpsStructure(unittest.TestCase):
         state_identity = {"user_message": "check login activities of user jdoe"}
         route = route_request(state_identity)
         self.assertEqual(route, "identity_agent")
+
+    def test_workflow_graph_runs_alert_flow(self):
+        run_workflow = build_workflow_graph()
+        state = run_workflow({"user_message": "Check the latest security alerts"})
+
+        self.assertEqual(state["current_agent"], "alert_agent")
+        self.assertIn("Alert analysis complete", state["agent_response"])
+        self.assertIsInstance(state["conversation_history"], list)
 
 if __name__ == "__main__":
     unittest.main()
