@@ -19,15 +19,20 @@ def route_request(state):
     """
     user_message = state.get("user_message", "").lower()
 
-    if "alert" in user_message or "severity" in user_message:
-        return "alert_agent"
-    elif "login" in user_message or "user activity" in user_message or "auth" in user_message:
-        return "identity_agent"
-    elif "device" in user_message or "endpoint" in user_message or "malware" in user_message:
+    # Check for correlation or threat hunting requests first
+    if "correlate" in user_message or "campaign" in user_message or "threat hunting" in user_message or "scenarios" in user_message:
+        return "reporting_agent" # Reporting agent handles scenario layouts
+
+    # Check for specific tool requests
+    if "device" in user_message or "endpoint" in user_message or "malware" in user_message or "edr" in user_message or "workstation" in user_message:
         return "endpoint_agent"
-    elif "incident" in user_message or "escalate" in user_message:
+    elif "alert" in user_message or "siem" in user_message or "firewall" in user_message:
+        return "alert_agent"
+    elif "login" in user_message or "failed attempt" in user_message or "user activity" in user_message or "auth" in user_message:
+        return "identity_agent"
+    elif "incident" in user_message or "escalate" in user_message or "ticket" in user_message:
         return "incident_agent"
-    elif "report" in user_message or "summary" in user_message:
+    elif "report" in user_message or "summary" in user_message or "executive summary" in user_message:
         return "reporting_agent"
 
-    return "alert_agent" # default fallback
+    return "alert_agent"  # Default fallback

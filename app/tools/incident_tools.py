@@ -6,10 +6,23 @@ Role:
 - Facilitates creating security incidents, updating their statuses, and handling escalations.
 """
 
+# In-memory mock database for security incident tickets
+INCIDENTS_DATABASE = [
+    {
+        "incident_id": "INC-2024-001",
+        "title": "Unapproved Database Dump",
+        "description": "Admin_ops account executed AD database dump.",
+        "priority": "HIGH",
+        "status": "OPEN",
+        "assignee": "SOC Tier 2 Team",
+        "created_at": "2024-07-24T03:30:00Z"
+    }
+]
+
 def create_security_incident(title, description, priority="HIGH"):
     """
     Mock function to log an incident in the ticketing system.
-    Requires Human-in-the-Loop validation before calling.
+    Requires Human-in-the-Loop validation before calling in a production flow.
 
     Args:
         title (str): Title of the security ticket.
@@ -19,15 +32,18 @@ def create_security_incident(title, description, priority="HIGH"):
     Returns:
         dict: Created incident confirmation including Incident ID.
     """
-    return {
-        "incident_id": "INC-2024-9081",
+    incident_id = f"INC-2024-{100 + len(INCIDENTS_DATABASE) + 1}"
+    new_ticket = {
+        "incident_id": incident_id,
         "title": title,
         "description": description,
         "priority": priority,
-        "status": "CREATED",
+        "status": "OPEN",
         "assignee": "SOC Tier 2 Team",
         "created_at": "2024-07-24T08:45:00Z"
     }
+    INCIDENTS_DATABASE.append(new_ticket)
+    return new_ticket
 
 def check_incident_status(incident_id):
     """
@@ -37,14 +53,12 @@ def check_incident_status(incident_id):
         incident_id (str): Incident ticket ID.
 
     Returns:
-        dict: Incident progress update.
+        dict: Incident progress update or None if not found.
     """
-    return {
-        "incident_id": incident_id,
-        "status": "INVESTIGATING",
-        "priority": "HIGH",
-        "comments": "Correlating with multiple outbound network events."
-    }
+    for inc in INCIDENTS_DATABASE:
+        if inc["incident_id"].upper() == incident_id.upper():
+            return inc
+    return None
 
 def escalate_incident(incident_id, escalation_reason):
     """
@@ -56,11 +70,28 @@ def escalate_incident(incident_id, escalation_reason):
         escalation_reason (str): Justification for escalation.
 
     Returns:
-        dict: Escalation result details.
+        dict: Escalation result details or None if not found.
     """
-    return {
-        "incident_id": incident_id,
-        "escalation_status": "ESCALATED_TIER3",
-        "reason": escalation_reason,
-        "timestamp": "2024-07-24T08:50:00Z"
-    }
+    for inc in INCIDENTS_DATABASE:
+        if inc["incident_id"].upper() == incident_id.upper():
+            inc["priority"] = "CRITICAL"
+            inc["assignee"] = "SOC Tier 3 / CIRT Team"
+            return {
+                "incident_id": incident_id,
+                "escalation_status": "ESCALATED_TIER3",
+                "reason": escalation_reason,
+                "timestamp": "2024-07-24T08:50:00Z",
+                "current_assignee": inc["assignee"]
+            }
+    return None
+
+def close_investigation(incident_id):
+    """
+    Closes the investigation and updates the ticket status.
+    Requires Human-in-the-Loop validation.
+    """
+    for inc in INCIDENTS_DATABASE:
+        if inc["incident_id"].upper() == incident_id.upper():
+            inc["status"] = "CLOSED"
+            return {"incident_id": incident_id, "status": "CLOSED", "closed_at": "2024-07-24T09:15:00Z"}
+    return None
