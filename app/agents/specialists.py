@@ -4,10 +4,11 @@ Purpose: Multi-Agent Engineer (Team Member 4)
 Role:
 - Implements specialized security agents that handle domain-specific workflows.
 - These agents are designed to execute tools provided by the Tool & Integration Engineer and format replies.
+- Checks if entries (e.g. usernames, workstation IDs, ticket IDs, alert IDs) exist inside the databases dynamically.
 """
 
 from app.tools.alert_tools import search_alerts, get_alert_details
-from app.tools.identity_tools import check_login_history, search_user_activity
+from app.tools.identity_tools import check_login_history, search_user_activity, check_user_exists
 from app.tools.endpoint_tools import check_device_status, verify_device_health
 from app.tools.incident_tools import create_security_incident, check_incident_status, escalate_incident, close_investigation
 from app.tools.reporting_tools import generate_investigation_report, summarize_security_alerts
@@ -37,6 +38,12 @@ def alert_analysis_agent(state):
                     f"- **Status:** {details['status']}"
                 )
                 return state
+            else:
+                state["agent_response"] = (
+                    f"### [Alert Search] {alert_id}\n"
+                    f"⚠️ Alert ID **{alert_id}** does not exist in the SIEM database."
+                )
+                return state
 
     # Default to search/list
     severity_filter = None
@@ -60,18 +67,21 @@ def endpoint_agent(state):
     Handles Device Health, Malware Detections, and EDR Statuses.
     Invokes endpoint status and EDR health tools.
     """
-    msg = state.get("user_message", "").lower()
+    msg = state.get("user_message", "")
 
     # Identify target workstation/device
     device_target = "WS-900" # default
-    if "ws-550" in msg:
-        device_target = "WS-550"
-    elif "ws-202" in msg:
-        device_target = "WS-202"
+    import re
+    match = re.search(r"WS-\d+", msg, re.IGNORECASE)
+    if match:
+        device_target = match.group(0).upper()
 
     status = check_device_status(device_target)
     if not status:
-        state["agent_response"] = f"Error: Endpoint asset '{device_target}' was not found in the EDR database."
+        state["agent_response"] = (
+            f"### Endpoint Security Status\n"
+            f"⚠️ Workstation asset **{device_target}** was not found in the EDR endpoint asset database."
+        )
         return state
 
     health = verify_device_health(device_target)
@@ -120,16 +130,17 @@ def identity_agent(state):
         else:
             username = "jdoe" # Global fallback
 
+    # Dynamic existence check
+    if not check_user_exists(username):
+        state["agent_response"] = (
+            f"### Identity and IAM Profiling: {username}\n"
+            f"⚠️ User **{username}** does not exist in the Identity Management Platform (IAM) database."
+        )
+        return state
+
     # Lookup in our mock tools
     history = check_login_history(username)
     activities = search_user_activity(username)
-
-    if not history and not activities:
-        state["agent_response"] = (
-            f"### Identity and IAM Profiling: {username}\n"
-            f"⚠️ No active authentication logs or system activities found for user **{username}** in the mock database."
-        )
-        return state
 
     response_text = f"### Identity and IAM Profiling: {username}\n"
     response_text += "#### Recent Authentication Records:\n"
@@ -172,7 +183,16 @@ def incident_agent(state):
         # Find target incident id
         import re
         match = re.search(r"inc-2024-\d+", msg)
-        inc_id = match.group(0).upper() if match else "INC-2024-001"
+        inc_id = match.group(0).upper() if match else "INC-2024-101"
+
+        # Check if exists before offering escalation HITL
+        status = check_incident_status(inc_id)
+        if not status:
+            state["agent_response"] = (
+                f"### Incident Escalation\n"
+                f"⚠️ Ticket ID **{inc_id}** does not exist in the Incident database."
+            )
+            return state
 
         state["approval_needed"] = True
         state["approval_action"] = "ESCALATE_INCIDENT"
@@ -186,7 +206,15 @@ def incident_agent(state):
     if "close" in msg:
         import re
         match = re.search(r"inc-2024-\d+", msg)
-        inc_id = match.group(0).upper() if match else "INC-2024-001"
+        inc_id = match.group(0).upper() if match else "INC-2024-101"
+
+        status = check_incident_status(inc_id)
+        if not status:
+            state["agent_response"] = (
+                f"### Close Incident\n"
+                f"⚠️ Ticket ID **{inc_id}** does not exist in the Incident database."
+            )
+            return state
 
         state["approval_needed"] = True
         state["approval_action"] = "CLOSE_INVESTIGATION"
@@ -213,8 +241,14 @@ def incident_agent(state):
                 f"- **Created At:** {status['created_at']}"
             )
             return state
+        else:
+            state["agent_response"] = (
+                f"### Incident Management\n"
+                f"⚠️ Ticket ID **{inc_id}** was not found in the Incident database."
+            )
+            return state
 
-    state["agent_response"] = "### Incident Management\nSpecify a ticket ID (e.g., INC-2024-001) or request to 'create incident' or 'escalate incident'."
+    state["agent_response"] = "### Incident Management\nSpecify a ticket ID (e.g., INC-2024-101) or request to 'create incident' or 'escalate incident'."
     return state
 
 def reporting_agent(state):
@@ -249,7 +283,15 @@ def reporting_agent(state):
     if "report" in msg:
         import re
         match = re.search(r"inc-2024-\d+", msg)
-        inc_id = match.group(0).upper() if match else "INC-2024-001"
+        inc_id = match.group(0).upper() if match else "INC-2024-101"
+
+        status = check_incident_status(inc_id)
+        if not status:
+            state["agent_response"] = (
+                f"### Report Generator\n"
+                f"⚠️ Cannot generate report. Ticket ID **{inc_id}** does not exist."
+            )
+            return state
 
         state["approval_needed"] = True
         state["approval_action"] = "GENERATE_FINAL_REPORT"

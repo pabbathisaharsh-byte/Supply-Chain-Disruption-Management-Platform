@@ -4,9 +4,26 @@ Purpose: Tool & Integration Engineer (Team Member 2)
 Role:
 - Facilitates automated generation of investigation reports and summaries.
 - Combines information retrieved across multiple specialist domains to format security writeups.
+- Reads and updates reports dynamically in 'app/data/reports.json'.
 """
 
-REPORTS_DATABASE = []
+import os
+import json
+
+REPORTS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "reports.json")
+
+def _load_reports():
+    if not os.path.exists(REPORTS_FILE):
+        return []
+    with open(REPORTS_FILE, "r") as f:
+        try:
+            return json.load(f)
+        except Exception:
+            return []
+
+def _save_reports(reports):
+    with open(REPORTS_FILE, "w") as f:
+        json.dump(reports, f, indent=4)
 
 def generate_investigation_report(incident_id, analyst_notes):
     """
@@ -20,7 +37,8 @@ def generate_investigation_report(incident_id, analyst_notes):
     Returns:
         dict: Generated report metadata and generated markdown body.
     """
-    report_id = f"REP-{8080 + len(REPORTS_DATABASE) + 1}"
+    reports = _load_reports()
+    report_id = f"REP-{8080 + len(reports) + 1}"
     report_body = f"""# SECURITY INCIDENT INVESTIGATION REPORT: {incident_id}
 **Report ID:** {report_id}
 **Classification:** HIGHLY CONFIDENTIAL
@@ -49,7 +67,8 @@ This document summarizes the timeline, threat indicators, and analyst findings r
         "full_report": report_body,
         "generated_at": "2024-07-24T09:00:00Z"
     }
-    REPORTS_DATABASE.append(new_report)
+    reports.append(new_report)
+    _save_reports(reports)
     return new_report
 
 def summarize_security_alerts(alerts):

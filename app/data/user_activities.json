@@ -1,0 +1,23 @@
+[
+    {
+        "username": "jdoe",
+        "timestamp": "2024-07-24T08:10:00Z",
+        "action": "ACCESS_SENSITIVE_REPOS",
+        "resource": "GitHub Enterprise /SecureCodebase",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "admin_ops",
+        "timestamp": "2024-07-24T03:20:00Z",
+        "action": "DUMP_ACTIVE_DIRECTORY",
+        "resource": "Domain Controller DC-01",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "developer1",
+        "timestamp": "2024-07-24T11:00:00Z",
+        "action": "GIT_PULL",
+        "resource": "GitHub Enterprise /SecureCodebase",
+        "status": "SUCCESS"
+    }
+]

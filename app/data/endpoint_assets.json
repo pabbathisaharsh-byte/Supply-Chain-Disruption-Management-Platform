@@ -1,0 +1,44 @@
+{
+    "WS-900": {
+        "device_name": "WS-900",
+        "assigned_user": "jdoe",
+        "os": "Windows 11 Enterprise",
+        "edr_agent_status": "ACTIVE",
+        "is_infected": true,
+        "last_malware_detection": "Trojan.Win32.Generic",
+        "last_seen": "2024-07-24T08:32:00Z",
+        "firewall_active": true,
+        "encryption_enabled": true,
+        "antivirus_signature_version": "v1.409.2",
+        "outbound_connections_count": 1450,
+        "managed_device": true
+    },
+    "WS-550": {
+        "device_name": "WS-550",
+        "assigned_user": "unmanaged",
+        "os": "macOS Sonoma",
+        "edr_agent_status": "INACTIVE",
+        "is_infected": false,
+        "last_malware_detection": "None",
+        "last_seen": "2024-07-24T11:58:00Z",
+        "firewall_active": false,
+        "encryption_enabled": false,
+        "antivirus_signature_version": "v0.0.0",
+        "outbound_connections_count": 120,
+        "managed_device": false
+    },
+    "WS-202": {
+        "device_name": "WS-202",
+        "assigned_user": "developer1",
+        "os": "Ubuntu 22.04 LTS",
+        "edr_agent_status": "ACTIVE",
+        "is_infected": true,
+        "last_malware_detection": "Suspicious-Ransomware-Script",
+        "last_seen": "2024-07-24T09:02:00Z",
+        "firewall_active": true,
+        "encryption_enabled": true,
+        "antivirus_signature_version": "v1.409.2",
+        "outbound_connections_count": 300,
+        "managed_device": true
+    }
+}
