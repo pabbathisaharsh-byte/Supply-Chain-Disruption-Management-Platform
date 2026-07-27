@@ -14,5 +14,5 @@ EDR_API_ENDPOINT = os.getenv("EDR_API_ENDPOINT", "https://api.mockedr.local/v1")
 IAM_API_ENDPOINT = os.getenv("IAM_API_ENDPOINT", "https://api.mockiam.local/v1")
 
 # LLM Config
-LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o")
+LLM_MODEL = os.getenv("LLM_MODEL", "llama3.2")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.0"))
