@@ -11,25 +11,86 @@ Role:
   - Generating a Final Report
 """
 
-def request_human_approval(action_type, details):
+from app.tools.incident_tools import create_security_incident, escalate_incident, close_investigation
+from app.tools.reporting_tools import generate_investigation_report
+from app.tools.alert_tools import update_alert_severity
+
+def handle_human_approval(action_type, details, analyst_approved=True):
     """
-    Halts execution and requests confirmation for sensitive actions.
+    Acts as a gating filter for sensitive mutations.
+    Executes the underlying tool only if analyst_approved is True.
 
     Args:
-        action_type (str): Type of action requiring validation.
-        details (dict): Context parameters for validation.
+        action_type (str): Type of critical mutation.
+        details (dict): Metadata payload.
+        analyst_approved (bool): Validation confirmation status from the analyst.
 
     Returns:
-        bool: True if authorized, False otherwise.
+        dict: Success details of execution, or failure log.
     """
-    critical_actions = [
-        "CREATE_INCIDENT",
-        "ESCALATE_INCIDENT",
-        "MARK_ALERT_CRITICAL",
-        "CLOSE_INVESTIGATION",
-        "GENERATE_FINAL_REPORT"
-    ]
-    if action_type in critical_actions:
-        # Prompting structural simulation or setting internal state to 'AWAITING_APPROVAL'
-        return False  # Defaults to pending analyst consent
-    return True
+    if not analyst_approved:
+        return {
+            "status": "DENIED",
+            "message": f"Action '{action_type}' was explicitly denied by the security analyst."
+        }
+
+    try:
+        if action_type == "CREATE_INCIDENT":
+            title = details.get("title", "New Incident")
+            desc = details.get("description", "No details")
+            pri = details.get("priority", "HIGH")
+            result = create_security_incident(title, desc, pri)
+            return {
+                "status": "APPROVED_AND_EXECUTED",
+                "message": f"Incident successfully created with ID {result['incident_id']}.",
+                "payload": result
+            }
+
+        elif action_type == "ESCALATE_INCIDENT":
+            inc_id = details.get("incident_id")
+            reason = details.get("reason", "No reason provided")
+            result = escalate_incident(inc_id, reason)
+            return {
+                "status": "APPROVED_AND_EXECUTED",
+                "message": f"Incident {inc_id} was escalated successfully to Tier 3 CIRT.",
+                "payload": result
+            }
+
+        elif action_type == "MARK_ALERT_CRITICAL":
+            alert_id = details.get("alert_id")
+            result = update_alert_severity(alert_id, "CRITICAL")
+            return {
+                "status": "APPROVED_AND_EXECUTED",
+                "message": f"Alert {alert_id} severity updated to CRITICAL.",
+                "payload": result
+            }
+
+        elif action_type == "CLOSE_INVESTIGATION":
+            inc_id = details.get("incident_id")
+            result = close_investigation(inc_id)
+            return {
+                "status": "APPROVED_AND_EXECUTED",
+                "message": f"Investigation for incident {inc_id} closed successfully.",
+                "payload": result
+            }
+
+        elif action_type == "GENERATE_FINAL_REPORT":
+            inc_id = details.get("incident_id")
+            notes = details.get("notes", "")
+            result = generate_investigation_report(inc_id, notes)
+            return {
+                "status": "APPROVED_AND_EXECUTED",
+                "message": f"Final report generated successfully. ID: {result['report_id']}",
+                "payload": result
+            }
+
+    except Exception as e:
+        return {
+            "status": "EXECUTION_ERROR",
+            "message": f"Failed to execute gated action {action_type}: {str(e)}"
+        }
+
+    return {
+        "status": "ERROR",
+        "message": f"Unknown gated action type: {action_type}"
+    }
