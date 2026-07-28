@@ -3,9 +3,9 @@
         "incident_id": "INC-2024-101",
         "title": "Unapproved Database Dump",
         "description": "Admin_ops account executed AD database dump.",
-        "priority": "HIGH",
+        "priority": "CRITICAL",
         "status": "OPEN",
-        "assignee": "SOC Tier 2 Team",
+        "assignee": "SOC Tier 3 / CIRT Team",
         "created_at": "2024-07-24T03:30:00Z"
     },
     {
