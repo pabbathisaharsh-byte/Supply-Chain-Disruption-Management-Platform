@@ -3,9 +3,9 @@
         "incident_id": "INC-2024-101",
         "title": "Unapproved Database Dump",
         "description": "Admin_ops account executed AD database dump.",
-        "priority": "HIGH",
+        "priority": "CRITICAL",
         "status": "OPEN",
-        "assignee": "SOC Tier 2 Team",
+        "assignee": "SOC Tier 3 / CIRT Team",
         "created_at": "2024-07-24T03:30:00Z"
     },
     {
@@ -24,6 +24,24 @@
         "priority": "HIGH",
         "status": "OPEN",
         "assignee": "SOC Tier 2 Team",
+        "created_at": "2024-07-24T08:45:00Z"
+    },
+    {
+        "incident_id": "INC-2024-104",
+        "title": "Incident Creation Request",
+        "description": "Create security incident based on security analyst session query.",
+        "priority": "HIGH",
+        "status": "OPEN",
+        "assignee": "SOC Tier 2 Team",
+        "created_at": "2024-07-24T08:45:00Z"
+    },
+    {
+        "incident_id": "INC-2024-105",
+        "title": "Incident Creation Request",
+        "description": "Create security incident based on security analyst session query.",
+        "priority": "CRITICAL",
+        "status": "OPEN",
+        "assignee": "SOC Tier 3 / CIRT Team",
         "created_at": "2024-07-24T08:45:00Z"
     }
 ]
