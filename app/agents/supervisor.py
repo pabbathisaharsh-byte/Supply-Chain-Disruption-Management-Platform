@@ -7,6 +7,16 @@ Role:
 - Orchestrates multi-agent transitions within the LangGraph state machine.
 """
 
+def _is_greeting_message(message):
+    normalized = message.strip().lower()
+    greeting_words = {"hi", "hello", "hey", "greetings", "howdy"}
+    tokens = [token.strip(".,!?;") for token in normalized.split()]
+
+    if len(tokens) <= 4 and any(token in greeting_words for token in tokens):
+        return True
+    return False
+
+
 def route_request(state):
     """
     Evaluates current state context and routes the query to the correct specialist node.
@@ -34,5 +44,9 @@ def route_request(state):
         return "incident_agent"
     elif "report" in user_message or "summary" in user_message or "executive summary" in user_message:
         return "reporting_agent"
+
+    # Handle simple greetings with a friendly domain-aware response
+    if _is_greeting_message(user_message):
+        return "greeting_agent"
 
     return "alert_agent"  # Default fallback

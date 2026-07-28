@@ -2,13 +2,16 @@
 
 ## Overview
 
-SecureOps AI is a simulated Security Operations Center (SOC) platform for managing supply-chain disruption scenarios using a multi-agent workflow. The app combines:
+SecureOps AI is a simulated Security Operations Center (SOC) platform for managing supply-chain disruption scenarios using a multi-agent workflow. This repository is the Phase 2 enhancement for the SecureOps AI project, with a focus on AI-powered threat hunting and event correlation.
+
+The app combines:
 
 - A Streamlit-based analyst chat interface
 - A supervisor agent that routes requests to specialist agents
 - Mock telemetry data for SIEM, EDR, IAM, and incident management
 - Human-in-the-loop gating for critical actions
 - AI-driven alert summarization, endpoint investigation, identity review, incident management, and report generation
+- Phase 2 correlation capabilities supporting at least five distinct investigation scenarios
 
 ## Architecture
 

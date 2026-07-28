@@ -13,7 +13,8 @@ from app.agents.specialists import (
     endpoint_agent,
     identity_agent,
     incident_agent,
-    reporting_agent
+    reporting_agent,
+    greeting_agent
 )
 
 # Shared graph state dictionary format
@@ -74,6 +75,8 @@ def execute_agent_workflow(user_message, history=None):
             state = incident_agent(state)
         elif target_agent == "reporting_agent":
             state = reporting_agent(state)
+        elif target_agent == "greeting_agent":
+            state = greeting_agent(state)
         else:
             state["error_logs"] = f"Unknown target specialist routing: {target_agent}"
             state = alert_analysis_agent(state)

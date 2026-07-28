@@ -13,6 +13,8 @@ from app.tools.endpoint_tools import check_device_status, verify_device_health
 from app.tools.incident_tools import create_security_incident, check_incident_status, escalate_incident, close_investigation
 from app.tools.reporting_tools import generate_investigation_report, summarize_security_alerts
 from app.tools.correlation_tools import correlate_events
+from app.tools.llm_client import generate_response
+from app.prompts.system_prompts import SYSTEM_PROMPT_GREETING_AGENT
 
 def alert_analysis_agent(state):
     """
@@ -159,6 +161,21 @@ def identity_agent(state):
 
     state["agent_response"] = response_text
     return state
+
+
+def greeting_agent(state):
+    """
+    Handles friendly, domain-aware greetings for analyst interactions.
+    """
+    user_message = state.get("user_message", "")
+    agent_response = generate_response(
+        SYSTEM_PROMPT_GREETING_AGENT,
+        user_message,
+    )
+
+    state["agent_response"] = agent_response
+    return state
+
 
 def incident_agent(state):
     """
