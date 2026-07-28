@@ -25,5 +25,14 @@
         "status": "OPEN",
         "assignee": "SOC Tier 2 Team",
         "created_at": "2024-07-24T08:45:00Z"
+    },
+    {
+        "incident_id": "INC-2024-104",
+        "title": "Incident Creation Request",
+        "description": "Create security incident based on security analyst session query.",
+        "priority": "HIGH",
+        "status": "OPEN",
+        "assignee": "SOC Tier 2 Team",
+        "created_at": "2024-07-24T08:45:00Z"
     }
 ]
