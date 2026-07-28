@@ -3,10 +3,21 @@
 Purpose: Multi-Agent Engineer (Team Member 4)
 Role:
 - Implements specialized security agents that handle domain-specific workflows.
-- These agents are designed to execute tools provided by the Tool & Integration Engineer and format replies.
-- Checks if entries (e.g. usernames, workstation IDs, ticket IDs, alert IDs) exist inside the databases dynamically.
+- Integrates local Llama 3.2 execution via Ollama API (http://localhost:11434/v1) with robust local fallbacks.
+- Feeds system prompts and dynamic JSON database contexts into the LLM to format natural responses.
+- Handles dynamic, user-specified lookups of workstation assets, alerts, logins, and incidents.
 """
 
+import re
+import json
+import urllib.request
+from app.prompts.system_prompts import (
+    SYSTEM_PROMPT_ALERT_AGENT,
+    SYSTEM_PROMPT_ENDPOINT_AGENT,
+    SYSTEM_PROMPT_IDENTITY_AGENT,
+    SYSTEM_PROMPT_INCIDENT_AGENT,
+    SYSTEM_PROMPT_REPORTING_AGENT
+)
 from app.tools.alert_tools import search_alerts, get_alert_details
 from app.tools.identity_tools import check_login_history, search_user_activity, check_user_exists
 from app.tools.endpoint_tools import check_device_status, verify_device_health
@@ -14,51 +25,92 @@ from app.tools.incident_tools import create_security_incident, check_incident_st
 from app.tools.reporting_tools import generate_investigation_report, summarize_security_alerts
 from app.tools.correlation_tools import correlate_events
 
+OLLAMA_API_URL = "http://localhost:11434/v1/chat/completions"
+
+def _query_llama32(system_prompt, user_query, database_context):
+    """
+    Attempts to call the local Llama 3.2 model running in Ollama.
+    If unreachable, returns None to trigger local rule-based dynamic fallbacks.
+    """
+    payload = {
+        "model": "llama3.2",
+        "messages": [
+            {"role": "system", "content": f"{system_prompt}\n\nHere is the relevant database context:\n{json.dumps(database_context, indent=2)}"},
+            {"role": "user", "content": user_query}
+        ],
+        "temperature": 0.0
+    }
+
+    try:
+        req = urllib.request.Request(
+            OLLAMA_API_URL,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=3) as response:
+            res_data = json.loads(response.read().decode("utf-8"))
+            return res_data["choices"][0]["message"]["content"]
+    except Exception:
+        # Graceful fallback when local Ollama container is offline
+        return None
+
 def alert_analysis_agent(state):
     """
     Handles Security Alerts, Alert Severities, and Threat Summaries.
     Invokes alert search and details retrieval tools.
     """
-    msg = state.get("user_message", "").lower()
+    msg = state.get("user_message", "")
 
-    # Check if querying a specific alert
-    if "alt-" in msg:
-        import re
-        match = re.search(r"alt-\d+", msg)
-        if match:
-            alert_id = match.group(0).upper()
-            details = get_alert_details(alert_id)
-            if details:
-                state["agent_response"] = (
-                    f"### [Alert Details] {alert_id}\n"
-                    f"- **System:** {details['system']}\n"
-                    f"- **Description:** {details['description']}\n"
-                    f"- **Severity:** {details['severity']}\n"
-                    f"- **Source Device:** {details['source_device']}\n"
-                    f"- **Status:** {details['status']}"
-                )
-                return state
-            else:
-                state["agent_response"] = (
-                    f"### [Alert Search] {alert_id}\n"
-                    f"⚠️ Alert ID **{alert_id}** does not exist in the SIEM database."
-                )
-                return state
+    # 1. Identify target alert ID if specified
+    alert_id = None
+    match = re.search(r"ALT-\d+", msg, re.IGNORECASE)
+    if match:
+        alert_id = match.group(0).upper()
 
-    # Default to search/list
+    if alert_id:
+        details = get_alert_details(alert_id)
+        if not details:
+            state["agent_response"] = f"### [Alert Search] {alert_id}\n⚠️ Alert ID **{alert_id}** does not exist in the SIEM database."
+            return state
+
+        # Try LLM
+        llm_res = _query_llama32(SYSTEM_PROMPT_ALERT_AGENT, msg, details)
+        if llm_res:
+            state["agent_response"] = llm_res
+            return state
+
+        # Dynamic Fallback
+        state["agent_response"] = (
+            f"### [Alert Details] {alert_id}\n"
+            f"- **System:** {details['system']}\n"
+            f"- **Description:** {details['description']}\n"
+            f"- **Severity:** {details['severity']}\n"
+            f"- **Source Device:** {details['source_device']}\n"
+            f"- **Status:** {details['status']}"
+        )
+        return state
+
+    # Default search / list
     severity_filter = None
     for sev in ["LOW", "MEDIUM", "HIGH", "CRITICAL"]:
-        if sev.lower() in msg:
+        if sev.lower() in msg.lower():
             severity_filter = sev
             break
 
     alerts = search_alerts(severity=severity_filter)
-    summary = summarize_security_alerts(alerts)
 
+    # Try LLM
+    llm_res = _query_llama32(SYSTEM_PROMPT_ALERT_AGENT, msg, alerts)
+    if llm_res:
+        state["agent_response"] = llm_res
+        return state
+
+    # Dynamic Fallback
+    summary = summarize_security_alerts(alerts)
     response_text = f"### SIEM & Firewall Alerts Found\n{summary}\n\n"
     for a in alerts[:5]:
         response_text += f"- **{a['alert_id']}** ({a['severity']}): {a['description']} on *{a['source_device']}*\n"
-
     state["agent_response"] = response_text
     return state
 
@@ -70,8 +122,7 @@ def endpoint_agent(state):
     msg = state.get("user_message", "")
 
     # Identify target workstation/device
-    device_target = "WS-900" # default
-    import re
+    device_target = "WS-900" # default fallback if none typed
     match = re.search(r"WS-\d+", msg, re.IGNORECASE)
     if match:
         device_target = match.group(0).upper()
@@ -85,7 +136,15 @@ def endpoint_agent(state):
         return state
 
     health = verify_device_health(device_target)
+    context_data = {"status": status, "health": health}
 
+    # Try LLM
+    llm_res = _query_llama32(SYSTEM_PROMPT_ENDPOINT_AGENT, msg, context_data)
+    if llm_res:
+        state["agent_response"] = llm_res
+        return state
+
+    # Dynamic Fallback
     state["agent_response"] = (
         f"### Endpoint Security Status: {device_target}\n"
         f"- **Assigned User:** {status['assigned_user']}\n"
@@ -105,11 +164,8 @@ def identity_agent(state):
     """
     msg = state.get("user_message", "")
 
-    # Try dynamically extracting username from phrases like "for <username>", "user <username>", or "check logins for <username>"
-    import re
+    # Try dynamically extracting username
     username = None
-
-    # Check common patterns
     match = re.search(r"for\s+([a-zA-Z0-9_\-\.]+)", msg, re.IGNORECASE)
     if match:
         username = match.group(1).strip()
@@ -119,7 +175,7 @@ def identity_agent(state):
             username = match.group(1).strip()
 
     if not username:
-        # Fallback to checking specific keywords in the message body
+        # Fallback keyword scan
         msg_lower = msg.lower()
         if "admin_ops" in msg_lower:
             username = "admin_ops"
@@ -127,8 +183,10 @@ def identity_agent(state):
             username = "developer1"
         elif "jdoe" in msg_lower:
             username = "jdoe"
-        else:
-            username = "jdoe" # Global fallback
+
+    # If still no username found, search if any mentioned word is a user or default
+    if not username:
+        username = "jdoe"
 
     # Dynamic existence check
     if not check_user_exists(username):
@@ -138,10 +196,17 @@ def identity_agent(state):
         )
         return state
 
-    # Lookup in our mock tools
     history = check_login_history(username)
     activities = search_user_activity(username)
+    context_data = {"username": username, "history": history, "activities": activities}
 
+    # Try LLM
+    llm_res = _query_llama32(SYSTEM_PROMPT_IDENTITY_AGENT, msg, context_data)
+    if llm_res:
+        state["agent_response"] = llm_res
+        return state
+
+    # Dynamic Fallback
     response_text = f"### Identity and IAM Profiling: {username}\n"
     response_text += "#### Recent Authentication Records:\n"
     if history:
@@ -168,7 +233,6 @@ def incident_agent(state):
     msg = state.get("user_message", "").lower()
 
     if "create" in msg or "open" in msg:
-        # Halt execution and request approval
         state["approval_needed"] = True
         state["approval_action"] = "CREATE_INCIDENT"
         state["approval_details"] = {
@@ -180,18 +244,12 @@ def incident_agent(state):
         return state
 
     if "escalate" in msg:
-        # Find target incident id
-        import re
         match = re.search(r"inc-2024-\d+", msg)
         inc_id = match.group(0).upper() if match else "INC-2024-101"
 
-        # Check if exists before offering escalation HITL
         status = check_incident_status(inc_id)
         if not status:
-            state["agent_response"] = (
-                f"### Incident Escalation\n"
-                f"⚠️ Ticket ID **{inc_id}** does not exist in the Incident database."
-            )
+            state["agent_response"] = f"### Incident Escalation\n⚠️ Ticket ID **{inc_id}** does not exist in the Incident database."
             return state
 
         state["approval_needed"] = True
@@ -204,16 +262,12 @@ def incident_agent(state):
         return state
 
     if "close" in msg:
-        import re
         match = re.search(r"inc-2024-\d+", msg)
         inc_id = match.group(0).upper() if match else "INC-2024-101"
 
         status = check_incident_status(inc_id)
         if not status:
-            state["agent_response"] = (
-                f"### Close Incident\n"
-                f"⚠️ Ticket ID **{inc_id}** does not exist in the Incident database."
-            )
+            state["agent_response"] = f"### Close Incident\n⚠️ Ticket ID **{inc_id}** does not exist in the Incident database."
             return state
 
         state["approval_needed"] = True
@@ -224,13 +278,18 @@ def incident_agent(state):
         state["agent_response"] = f"### Action Pending Confirmation\nClosing investigation for incident **{inc_id}** requires Human-in-the-loop validation."
         return state
 
-    # Default to status lookup
-    import re
+    # Default status lookup
     match = re.search(r"inc-2024-\d+", msg)
     if match:
         inc_id = match.group(0).upper()
         status = check_incident_status(inc_id)
         if status:
+            # Try LLM
+            llm_res = _query_llama32(SYSTEM_PROMPT_INCIDENT_AGENT, state.get("user_message", ""), status)
+            if llm_res:
+                state["agent_response"] = llm_res
+                return state
+
             state["agent_response"] = (
                 f"### Incident Status: {inc_id}\n"
                 f"- **Title:** {status['title']}\n"
@@ -242,10 +301,7 @@ def incident_agent(state):
             )
             return state
         else:
-            state["agent_response"] = (
-                f"### Incident Management\n"
-                f"⚠️ Ticket ID **{inc_id}** was not found in the Incident database."
-            )
+            state["agent_response"] = f"### Incident Management\n⚠️ Ticket ID **{inc_id}** was not found in the Incident database."
             return state
 
     state["agent_response"] = "### Incident Management\nSpecify a ticket ID (e.g., INC-2024-101) or request to 'create incident' or 'escalate incident'."
@@ -262,6 +318,13 @@ def reporting_agent(state):
     if "correlate" in msg or "campaign" in msg or "threat hunting" in msg or "scenarios" in msg:
         campaigns = correlate_events()
 
+        # Try LLM
+        llm_res = _query_llama32(SYSTEM_PROMPT_REPORTING_AGENT, state.get("user_message", ""), campaigns)
+        if llm_res:
+            state["agent_response"] = llm_res
+            return state
+
+        # Fallback
         response_text = "### Phase 2 Event Correlation & Threat Hunting Insights\n"
         response_text += f"The AI Correlation Engine parsed active SIEM, IAM, and EDR logs and successfully matched **{len(campaigns)}** high-confidence multi-stage attack scenarios:\n\n"
 
@@ -281,16 +344,12 @@ def reporting_agent(state):
         return state
 
     if "report" in msg:
-        import re
         match = re.search(r"inc-2024-\d+", msg)
         inc_id = match.group(0).upper() if match else "INC-2024-101"
 
         status = check_incident_status(inc_id)
         if not status:
-            state["agent_response"] = (
-                f"### Report Generator\n"
-                f"⚠️ Cannot generate report. Ticket ID **{inc_id}** does not exist."
-            )
+            state["agent_response"] = f"### Report Generator\n⚠️ Cannot generate report. Ticket ID **{inc_id}** does not exist."
             return state
 
         state["approval_needed"] = True
