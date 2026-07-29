@@ -19,5 +19,194 @@
         "action": "GIT_PULL",
         "resource": "GitHub Enterprise /SecureCodebase",
         "status": "SUCCESS"
+    },
+    {
+        "username": "alice",
+        "timestamp": "2024-07-24T09:15:00Z",
+        "action": "DOWNLOAD_FINANCIAL_REPORTS",
+        "resource": "Finance Share",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "alice",
+        "timestamp": "2024-07-24T09:18:00Z",
+        "action": "UPLOAD_EXTERNAL_STORAGE",
+        "resource": "Dropbox",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "bob",
+        "timestamp": "2024-07-24T10:05:00Z",
+        "action": "CREATE_NEW_ADMIN_ACCOUNT",
+        "resource": "Active Directory",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "bob",
+        "timestamp": "2024-07-24T10:07:00Z",
+        "action": "DISABLE_SECURITY_LOGGING",
+        "resource": "Windows Event Logs",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "charlie",
+        "timestamp": "2024-07-24T10:25:00Z",
+        "action": "VPN_CONNECT",
+        "resource": "Corporate VPN",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "charlie",
+        "timestamp": "2024-07-24T10:28:00Z",
+        "action": "OPEN_OUTLOOK",
+        "resource": "Exchange Online",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "finance_mgr",
+        "timestamp": "2024-07-24T01:35:00Z",
+        "action": "EXPORT_CUSTOMER_DATABASE",
+        "resource": "CRM Production",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "finance_mgr",
+        "timestamp": "2024-07-24T01:38:00Z",
+        "action": "DELETE_AUDIT_LOGS",
+        "resource": "SIEM",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "intern1",
+        "timestamp": "2024-07-24T13:20:00Z",
+        "action": "ACCESS_HR_FILES",
+        "resource": "HR Share",
+        "status": "DENIED"
+    },
+    {
+        "username": "intern1",
+        "timestamp": "2024-07-24T13:22:00Z",
+        "action": "REQUEST_PRIVILEGE_ESCALATION",
+        "resource": "Identity Management Portal",
+        "status": "PENDING"
+    },
+    {
+        "username": "ceo",
+        "timestamp": "2024-07-24T02:15:00Z",
+        "action": "DOWNLOAD_BOARD_DOCUMENTS",
+        "resource": "Executive SharePoint",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "support1",
+        "timestamp": "2024-07-24T15:45:00Z",
+        "action": "RESET_USER_PASSWORD",
+        "resource": "Active Directory",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "security_admin",
+        "timestamp": "2024-07-24T23:58:00Z",
+        "action": "RUN_ENDPOINT_SCAN",
+        "resource": "CrowdStrike Console",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "security_admin",
+        "timestamp": "2024-07-25T00:10:00Z",
+        "action": "ISOLATE_HOST",
+        "resource": "Workstation WS-104",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "api_service",
+        "timestamp": "2024-07-24T20:10:00Z",
+        "action": "ROTATE_API_KEYS",
+        "resource": "AWS Secrets Manager",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "contractor1",
+        "timestamp": "2024-07-24T22:50:00Z",
+        "action": "CLONE_PRIVATE_REPOSITORY",
+        "resource": "GitHub Enterprise /InternalTools",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "contractor1",
+        "timestamp": "2024-07-24T22:55:00Z",
+        "action": "ARCHIVE_SOURCE_CODE",
+        "resource": "Local Workstation",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "testuser",
+        "timestamp": "2024-07-24T16:30:00Z",
+        "action": "FAILED_API_AUTHENTICATION",
+        "resource": "Internal API Gateway",
+        "status": "FAILED"
+    },
+    {
+        "username": "administrator",
+        "timestamp": "2024-07-24T16:35:00Z",
+        "action": "INSTALL_REMOTE_ACCESS_TOOL",
+        "resource": "Server APP-02",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "administrator",
+        "timestamp": "2024-07-24T16:40:00Z",
+        "action": "RESTART_CRITICAL_SERVICE",
+        "resource": "Payment Gateway",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "developer2",
+        "timestamp": "2024-07-24T14:00:00Z",
+        "action": "PUSH_CODE",
+        "resource": "GitHub Enterprise /BackendAPI",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "developer2",
+        "timestamp": "2024-07-24T14:05:00Z",
+        "action": "CREATE_PERSONAL_ACCESS_TOKEN",
+        "resource": "GitHub Enterprise",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "analyst1",
+        "timestamp": "2024-07-24T17:10:00Z",
+        "action": "QUERY_SIEM_LOGS",
+        "resource": "Splunk",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "analyst1",
+        "timestamp": "2024-07-24T17:20:00Z",
+        "action": "GENERATE_INCIDENT_REPORT",
+        "resource": "ServiceNow",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "cloud_admin",
+        "timestamp": "2024-07-24T18:15:00Z",
+        "action": "DELETE_S3_BUCKET",
+        "resource": "AWS S3 /customer-backups",
+        "status": "FAILED"
+    },
+    {
+        "username": "cloud_admin",
+        "timestamp": "2024-07-24T18:18:00Z",
+        "action": "MODIFY_SECURITY_GROUP",
+        "resource": "AWS EC2",
+        "status": "SUCCESS"
+    },
+    {
+        "username": "backup_service",
+        "timestamp": "2024-07-24T23:30:00Z",
+        "action": "BACKUP_DATABASE",
+        "resource": "SQL Production Cluster",
+        "status": "SUCCESS"
     }
 ]

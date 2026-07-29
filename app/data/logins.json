@@ -38,5 +38,165 @@
         "location": "Corporate HQ VPN",
         "status": "SUCCESS",
         "details": "Standard login"
+    },
+    {
+        "username": "alice",
+        "timestamp": "2024-07-24T09:10:00Z",
+        "ip_address": "192.0.2.101",
+        "location": "Germany",
+        "status": "FAILED",
+        "details": "Incorrect password"
+    },
+    {
+        "username": "alice",
+        "timestamp": "2024-07-24T09:11:00Z",
+        "ip_address": "192.0.2.101",
+        "location": "Germany",
+        "status": "FAILED",
+        "details": "Incorrect password"
+    },
+    {
+        "username": "alice",
+        "timestamp": "2024-07-24T09:12:00Z",
+        "ip_address": "192.0.2.101",
+        "location": "Germany",
+        "status": "FAILED",
+        "details": "Account locked after multiple failed attempts"
+    },
+    {
+        "username": "bob",
+        "timestamp": "2024-07-24T11:00:00Z",
+        "ip_address": "203.0.113.45",
+        "location": "Canada",
+        "status": "SUCCESS",
+        "details": "Standard login"
+    },
+    {
+        "username": "bob",
+        "timestamp": "2024-07-24T11:08:00Z",
+        "ip_address": "203.0.113.210",
+        "location": "Japan",
+        "status": "SUCCESS",
+        "details": "Impossible travel detected"
+    },
+    {
+        "username": "finance_mgr",
+        "timestamp": "2024-07-24T01:30:00Z",
+        "ip_address": "198.51.100.88",
+        "location": "Russia",
+        "status": "SUCCESS",
+        "details": "Successful login from unusual country"
+    },
+    {
+        "username": "finance_mgr",
+        "timestamp": "2024-07-24T01:32:00Z",
+        "ip_address": "198.51.100.88",
+        "location": "Russia",
+        "status": "SUCCESS",
+        "details": "Privileged role accessed"
+    },
+    {
+        "username": "charlie",
+        "timestamp": "2024-07-24T12:05:00Z",
+        "ip_address": "10.0.8.17",
+        "location": "Corporate HQ VPN",
+        "status": "SUCCESS",
+        "details": "Standard login"
+    },
+    {
+        "username": "intern1",
+        "timestamp": "2024-07-24T13:15:00Z",
+        "ip_address": "203.0.113.77",
+        "location": "India",
+        "status": "FAILED",
+        "details": "Expired password"
+    },
+    {
+        "username": "ceo",
+        "timestamp": "2024-07-24T02:10:00Z",
+        "ip_address": "198.51.100.66",
+        "location": "Unknown Country",
+        "status": "SUCCESS",
+        "details": "New device login"
+    },
+    {
+        "username": "ceo",
+        "timestamp": "2024-07-24T02:12:00Z",
+        "ip_address": "198.51.100.66",
+        "location": "Unknown Country",
+        "status": "SUCCESS",
+        "details": "Mailbox access initiated"
+    },
+    {
+        "username": "support1",
+        "timestamp": "2024-07-24T15:40:00Z",
+        "ip_address": "192.168.10.25",
+        "location": "Corporate LAN",
+        "status": "SUCCESS",
+        "details": "Standard login"
+    },
+    {
+        "username": "guest",
+        "timestamp": "2024-07-24T16:20:00Z",
+        "ip_address": "198.51.100.199",
+        "location": "Brazil",
+        "status": "FAILED",
+        "details": "Unknown username"
+    },
+    {
+        "username": "testuser",
+        "timestamp": "2024-07-24T16:22:00Z",
+        "ip_address": "198.51.100.199",
+        "location": "Brazil",
+        "status": "FAILED",
+        "details": "Unknown username"
+    },
+    {
+        "username": "administrator",
+        "timestamp": "2024-07-24T16:24:00Z",
+        "ip_address": "198.51.100.199",
+        "location": "Brazil",
+        "status": "FAILED",
+        "details": "Password spraying suspected"
+    },
+    {
+        "username": "hr_manager",
+        "timestamp": "2024-07-24T18:30:00Z",
+        "ip_address": "203.0.113.155",
+        "location": "United Kingdom",
+        "status": "FAILED",
+        "details": "MFA verification failed"
+    },
+    {
+        "username": "hr_manager",
+        "timestamp": "2024-07-24T18:33:00Z",
+        "ip_address": "203.0.113.155",
+        "location": "United Kingdom",
+        "status": "SUCCESS",
+        "details": "Successful login after MFA"
+    },
+    {
+        "username": "security_admin",
+        "timestamp": "2024-07-24T23:55:00Z",
+        "ip_address": "198.51.100.250",
+        "location": "Singapore",
+        "status": "SUCCESS",
+        "details": "Administrative login during maintenance window"
+    },
+    {
+        "username": "api_service",
+        "timestamp": "2024-07-24T20:00:00Z",
+        "ip_address": "10.10.1.50",
+        "location": "Internal Network",
+        "status": "SUCCESS",
+        "details": "Service account authentication"
+    },
+    {
+        "username": "contractor1",
+        "timestamp": "2024-07-24T22:45:00Z",
+        "ip_address": "203.0.113.180",
+        "location": "Nigeria",
+        "status": "SUCCESS",
+        "details": "Login from TOR exit node detected"
     }
 ]
