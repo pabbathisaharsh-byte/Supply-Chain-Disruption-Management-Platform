@@ -12,6 +12,7 @@ The app combines:
 - Human-in-the-loop gating for critical actions
 - AI-driven alert summarization, endpoint investigation, identity review, incident management, and report generation
 - Phase 2 correlation capabilities supporting at least five distinct investigation scenarios
+<img width="1920" height="1080" alt="Screenshot (2)" src="https://github.com/user-attachments/assets/ba653821-9038-49c6-97d7-bed8fd6ec182" />
 
 ## Architecture
 
