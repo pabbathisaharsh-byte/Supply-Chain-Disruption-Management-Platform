@@ -56,6 +56,21 @@ The app reads and updates local JSON files under `app/data/`:
 - `incidents.json`
 - `reports.json`
 
+## Application Link
+
+SecureOps AI - Advanced SOC Assistant · Streamlit
+
+## Technology Stack
+
+Frontend/UI - Streamlit
+Language - Python
+LLM Orchestration - LangChain
+Workflow - LangGraph
+LLM Integration - LangChain-OpenAI
+Data Validation - Pydantic
+Document Processing - PyPDF
+Framework - Pytest
+
 ## Results
 
 <img width="1920" height="1080" alt="Screenshot (2)" src="https://github.com/user-attachments/assets/2e240ee1-e2ed-4fee-8d7e-adf418828fab" />
