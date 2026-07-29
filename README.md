@@ -58,7 +58,7 @@ The app reads and updates local JSON files under `app/data/`:
 
 ## Application Link
 
-SecureOps AI - Advanced SOC Assistant · Streamlit
+https://supply-chain-disruption-management-platform-9shb4fmsv9szkgi3mn.streamlit.app/
 
 ## Technology Stack
 
