@@ -1,4 +1,5 @@
 # Supply-Chain-Disruption-Management-Platform
+<img width="1920" height="1080" alt="Screenshot (2)" src="https://github.com/user-attachments/assets/0d7c77e4-2f5d-4cef-82d8-13d7076772e4" />
 
 ## Overview
 
