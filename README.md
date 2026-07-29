@@ -62,14 +62,14 @@ SecureOps AI - Advanced SOC Assistant · Streamlit
 
 ## Technology Stack
 
-Frontend/UI - Streamlit
-Language - Python
-LLM Orchestration - LangChain
-Workflow - LangGraph
-LLM Integration - LangChain-OpenAI
-Data Validation - Pydantic
-Document Processing - PyPDF
-Framework - Pytest
+- Frontend/UI - Streamlit
+- Language - Python
+- LLM Orchestration - LangChain
+- Workflow - LangGraph
+- LLM Integration - LangChain-OpenAI
+- Data Validation - Pydantic
+- Document Processing - PyPDF
+- Framework - Pytest
 
 ## Results
 
