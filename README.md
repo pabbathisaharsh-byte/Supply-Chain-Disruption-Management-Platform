@@ -56,6 +56,20 @@ The app reads and updates local JSON files under `app/data/`:
 - `incidents.json`
 - `reports.json`
 
+## Results
+
+<img width="1920" height="1080" alt="Screenshot (2)" src="https://github.com/user-attachments/assets/2e240ee1-e2ed-4fee-8d7e-adf418828fab" />
+<img width="1920" height="1080" alt="Screenshot (3)" src="https://github.com/user-attachments/assets/a6b90f62-ff13-4522-8883-764b4c75e7b8" />
+<img width="1920" height="1080" alt="Screenshot (4)" src="https://github.com/user-attachments/assets/a713ca2b-8fa2-4a21-b04e-b82c7b3abc9c" />
+<img width="1920" height="1080" alt="Screenshot (5)" src="https://github.com/user-attachments/assets/00e57078-3755-4380-9900-4a1088c223a2" />
+<img width="1920" height="1080" alt="Screenshot (6)" src="https://github.com/user-attachments/assets/df67955d-ab7c-4ffc-95bc-cdbc1c27c605" />
+<img width="1920" height="1080" alt="Screenshot (7)" src="https://github.com/user-attachments/assets/7c650ca6-f122-4111-b96c-ea983af03443" />
+
+
+
+
+
+
 ## Installation
 
 1. Create and activate a Python environment.
